@@ -15,10 +15,25 @@ def compute_position_in_frame(p, frame):
         error: p expressed in the new coordinate frame [e_x, e_y]
     """
     # BEGIN QUESTION 1.2
-    "*** REPLACE THIS LINE ***"
-    raise NotImplementedError
+    # Extract positions and heading
+    p_x, p_y, p_heading = p[0], p[1], p[2]
+    frame_x, frame_y, frame_heading = frame[0], frame[1], frame[2]
+    
+    # Step 1: Translate - compute relative position in global frame
+    dx = p_x - frame_x
+    dy = p_y - frame_y
+    
+    # Step 2: Rotate - transform to the frame's local coordinate system
+    # Rotation by -frame_heading (inverse rotation)
+    cos_theta = np.cos(-frame_heading)
+    sin_theta = np.sin(-frame_heading)
+    
+    # Apply 2D rotation matrix
+    e_x = cos_theta * dx - sin_theta * dy
+    e_y = sin_theta * dx + cos_theta * dy
+    
+    return np.array([e_x, e_y])
     # END QUESTION 1.2
-
 
 class BaseController(object):
     def __init__(self, **kwargs):
@@ -77,10 +92,41 @@ class BaseController(object):
             # Hint: compute all the distances from the current state to the
             # path's waypoints. You may find the `argmin` method useful.
             # BEGIN QUESTION 1.1
-            "*** REPLACE THIS LINE ***"
-            raise NotImplementedError
-            # END QUESTION 1.1
-            return len(path_xytv) - 1
+            path_xy = path_xytv[:, :2]  # 
+            pose_xy = pose[:2]      # Get x from current y
+
+            # Vectorized distance computation
+            distances = np.linalg.norm(path_xy - pose_xy, axis=1)  # Shape: (L,)
+            
+            # Step 2: Find the closest waypoint index
+            closest_idx = np.argmin(distances)
+            
+            # Step 3: Starting from closest_idx, find first waypoint beyond lookahead distance
+            # Only consider waypoints at or after the closest point (avoid going backwards)
+            distances_from_closest = distances[closest_idx:]
+            
+            # Find indices where distance > lookahead
+            beyond_lookahead = np.where(distances_from_closest > distance_lookahead)[0]
+            
+            if len(beyond_lookahead) > 0:
+                # Found at least one point beyond lookahead
+                first_beyond_idx = beyond_lookahead[0]
+                reference_idx = closest_idx + first_beyond_idx
+                
+                # Optimization: check if previous index is closer to desired lookahead
+                if reference_idx > closest_idx:
+                    dist_current = distances[reference_idx]
+                    dist_previous = distances[reference_idx - 1]
+                    
+                    # Choose whichever is closer to the desired lookahead distance
+                    if abs(dist_previous - distance_lookahead) < abs(dist_current - distance_lookahead):
+                        reference_idx = reference_idx - 1
+                
+                return reference_idx
+            else:
+                # No point beyond lookahead found, return the last point
+                return len(path_xytv) - 1
+        # END QUESTION 1.1
 
     def get_error(self, pose, reference_xytv):
         """Compute the error vector.

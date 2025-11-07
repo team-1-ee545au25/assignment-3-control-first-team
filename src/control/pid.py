@@ -38,7 +38,23 @@ class PIDController(BaseController):
             control: np.array of velocity and steering angle
                 (velocity should be copied from reference velocity)
         """
-        # BEGIN QUESTION 2.1
-        "*** REPLACE THIS LINE ***"
-        raise NotImplementedError
+        # QUESTION 2.1
+	cross_track_error = error[1]
+	heading_error = pose[2] - reference_xytv[2]
+	heading_error = np.arctan2(np.sin(heading_error), np.cos(heading_error))
+
+	# Velocity gains
+	v_ref = reference_xytv[3]
+	kp_scaled = self.kp * v_ref
+        
+	# PD control law
+	steering_angle = -kp_scaled * cross_track_error - self.kd * heading_error
+
+	# Saturation limits
+	max_steering = np.deg2rad(30)
+	steering_angle = np.clip(steering_angle, -max_steering, max_steering)
+
+	velocity = v_ref
+	
+	return np.array([velocity, steering_angle])
         # END QUESTION 2.1
