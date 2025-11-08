@@ -34,9 +34,21 @@ class PurePursuitController(BaseController):
             error: error vector from get_error
 
         Returns:
-            control: np.array of velocity and steering angle
+            control: np.array of velocity and steering angles
         """
         # BEGIN QUESTION 3.1
-        "*** REPLACE THIS LINE ***"
-        raise NotImplementedError
+        v_ref = max(float(reference_xytv[3]), self.min_speed)
+
+        x_L = float(error[0])
+        y_L = float(error[1])
+
+        L_d2 = x_L * x_L + y_L * y_L
+        if L_d2 < 1e-9:
+            return np.array([v_ref, 0.0])
+
+        delta = np.arctan( (2.0 * self.car_length * y_L) / L_d2 )
+
+        return np.array([v_ref, delta])
+
+
         # END QUESTION 3.1

@@ -15,8 +15,17 @@ def compute_position_in_frame(p, frame):
         error: p expressed in the new coordinate frame [e_x, e_y]
     """
     # BEGIN QUESTION 1.2
-    "*** REPLACE THIS LINE ***"
-    raise NotImplementedError
+    px,py,_ = p
+    fx, fy, ftheta = frame
+
+    dx = px - fx
+    dy = py - fy
+
+    First_frame = np.cos(ftheta) *dx + np.sin(ftheta) * dy
+    Second_frame = -np.sin(ftheta) * dx + np.cos(ftheta) * dy
+
+    return np.array([First_frame, Second_frame])
+    # raise NotImplementedError
     # END QUESTION 1.2
 
 
@@ -77,10 +86,23 @@ class BaseController(object):
             # Hint: compute all the distances from the current state to the
             # path's waypoints. You may find the `argmin` method useful.
             # BEGIN QUESTION 1.1
-            "*** REPLACE THIS LINE ***"
-            raise NotImplementedError
-            # END QUESTION 1.1
-            return len(path_xytv) - 1
+            px = pose[0]
+            py = pose[1]
+            path_xy = path_xytv[:,:2]
+
+            distance = np.linalg.norm(path_xy - np.array([px, py]), axis=1)
+
+            closest_idx = np.argmin(distance)
+
+            future_dists = distance[closest_idx:]
+            idx_ahead = np.where(future_dists >= distance_lookahead)[0]
+
+            if len(idx_ahead) == 0:
+                return len(path_xytv) - 1
+
+            return closest_idx + idx_ahead[0]
+            # raise NotImplementedError
+            # # END QUESTION 1.1
 
     def get_error(self, pose, reference_xytv):
         """Compute the error vector.
@@ -108,6 +130,7 @@ class BaseController(object):
         """
         # Subclasses will override this method
         raise NotImplementedError
+
 
     def path_complete(self, pose, error, distance_lookahead):
         """Return whether the reference path has been completed.

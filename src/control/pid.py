@@ -39,6 +39,15 @@ class PIDController(BaseController):
                 (velocity should be copied from reference velocity)
         """
         # BEGIN QUESTION 2.1
-        "*** REPLACE THIS LINE ***"
-        raise NotImplementedError
+        v_ref = reference_xytv[3]
+        e_ct = error[1]
+        theta = pose[2]
+        theta_ref = reference_xytv[2]
+        # heading difference wrapped to (-pi, pi)
+        heading_err = np.arctan2(np.sin(theta - theta_ref), np.cos(theta - theta_ref))
+
+        # analytic derivative: ȧe_ct = v * sin(theta - theta_ref)
+        e_ct_dot = v_ref * np.sin(heading_err)
+        delta = (-self.kp * e_ct) - (self.kd * e_ct_dot)
+        return np.array([v_ref, delta])
         # END QUESTION 2.1
