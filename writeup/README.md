@@ -2,10 +2,26 @@
 
 Replace this with your own writeup! Please place all figures in this directory.
 
+
+
+Q1:
+When the Kd value was low, the controller exhibited oscillation and overshoot, as there was insufficient damping in the steering response.
+As I increased Kd, the oscillations and overshoot gradually reduced.
+A higher derivative gain provided stronger damping, which helped the vehicle stabilize around the reference path and reduced aggressive steering corrections.
+
 Q2:
 pid:
   kp: 0.05
   kd: 0.95
+The tuning process involved finding a balance between responsiveness and damping.
+With the default values, the robot oscillated and overshot around the path, indicating under-damped dynamics.
+I started with a small Kd = 0.1, which made the oscillation worse.
+By gradually increasing Kd (to 0.7, then to 0.95), I observed that the robot’s motion became smoother and the overshoot nearly disappeared.
+This final gain combination provided a stable tracking performance without making the robot sluggish.
+
+![pid_circle](./pid_circle.png)
+![pid_left-turn](./pid_left-turn.png)
+![pid_wave](./pid_wave.png)
 
 
 Q3:
@@ -14,16 +30,45 @@ pid:
   kd: 0.95
 pp:
   distance_lookahead: 0.7
-mpc:
-  K: 2
-  T: 1
+![pp_wave](./pp_wave.png)
 
-In order to reduce the curvature of robot following the reference path, I had to increase the distance_lookahead step by step. Initial Ld value was 0.1, and i increased to 0.5. THis value had less curvature error, but keep spinning around at the end of reference path. I had to increase to 0.7, which gave us small curvature and good stopping point at the end of the reference path.
+To reduce excessive curvature and improve path stability, I tuned the distance_lookahead parameter step by step.
+Starting with 0.1 of distance_lookahead, the robot reacted too sharply to local curvature and often spun at the end of the path.
+Increasing it to 0.5 improved stability but still caused instability at the goal.
+At 0.7, the robot achieved a smoother trajectory, smaller curvature error, and a clean stop at the end of the reference path.
 
-Additional Answer:
-PP_small (distance lookahead = 0.1): The model became very responsive where it takes aggressive turns. It seems like its overreacting to every curves.
+Q4:
+![pp_small](./pp_small.png)
+![pp_large](./pp_large.png)
+PP_small (distance lookahead = 0.1): The model became very responsive, where it takes aggressive turns. It seems like its overreacting to every curves.
+pp_large (distance lookahead = 1.5): The model became smoother and more stable to track. but a wider turning radius.
 
-pp_large (distance lookahead = ): The model became smoother and more stable to track. but wider turning radius.
+Q5:
+![pp_radius_0.5](./pp_radius_0.5.png)
+![pp_radius_5](./pp_radius_5.png)
+When following a 5 m radius circle, the robot tracked the reference trajectory accurately and maintained a smooth curvature with minimal steady-state error.
+However, at a 0.5 m radius, the curvature required exceeded the robot’s steering limits.
+This caused understeering and orbiting behavior, where the robot circled instead of following the smaller path.
 
-Circle Radius Answer:
-While 5m radius gave a proper modeling, 0.5 radius was not feasible to track. When the radius is big enough, then prediction doesn't oversteer. s
+
+Q6:
+
+Q7:
+
+Q8:
+
+Q9:
+
+
+Q10:
+Particle filter Video: https://drive.google.com/file/d/1LP4O7IAUXu6dQxYtQ48asGNjiZBGqWjk/view?usp=drive_link
+
+Q11:
+pp video: https://drive.google.com/file/d/1D29HZS6hnVpiHgB4QlPdELw810_EL7Kk/view?usp=drive_link
+
+
+
+
+
+
+
