@@ -58,6 +58,13 @@ Q7:
 Q8:
 
 Q9:
+Upon tuning our model, we found out
+a. pid, our most robost variables were kp = 0.05, and kd = 0.95
+b. pp, the idea distance_lookahead: 1.0 
+c. mpc: K = 8 and T = 12
+These values provided the most accurate and robust assessment of our robot. it enabled the Robot to navigate all 3 obstacles in the simulation.
+There was a lot of promise when we tuning the mpc values. MPC allows the robot to see further ahead, anticipate obstacles and provide a solution. 
+This feature enables the robot to find a solution before meeting the problem and thus provides the best in high speed regimes
 
 
 Q10:
